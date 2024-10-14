@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Comprovativo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        #uploadForm {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-label {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+        .file-label:hover {
+            background-color: #2980b9;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        #result {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .valid {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .invalid {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verificador de Comprovativo</h1>
+    <form id="uploadForm">
+        <label for="fileInput" class="file-label">
+            <i class="fas fa-file-upload"></i> Escolher Arquivo
+        </label>
+        <input type="file" id="fileInput" required>
+        <button type="submit"><i class="fas fa-check"></i> Verificar</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            if (fileInput.files.length === 0) {
+                resultDiv.textContent = 'Por favor, selecione um arquivo.';
+                resultDiv.className = 'show';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                resultDiv.innerHTML = '<div class="loading"></div> Enviando e verificando o arquivo...';
+                resultDiv.className = 'show';
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<div class="loading"></div> Processando...';
+
+                const response = await axios.post('https://verifica-jet.vercel.app/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(response.data)
+                const isValid = response.data.original;
+
+
+
+
+                const icon = isValid ? '<i class="fas fa-check-circle icon"></i>' : '<i class="fas fa-times-circle icon"></i>';
+                const status = isValid ? 'Comprovativo Válido' : 'Comprovativo Falso';
+                const statusClass = isValid ? 'valid' : 'invalid';
+
+                resultDiv.innerHTML = `
+                    <h2 class="${statusClass}">${icon}${status}</h2>
+                `;
+
+
+            } catch (error) {
+                resultDiv.innerHTML = `<h2 class="invalid"><i class="fas fa-exclamation-triangle icon"></i>Erro</h2>
+                    <pre>${error.response ? error.response.data.error : error.message}</pre>`;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-check"></i> Verificar';
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name || 'Nenhum arquivo selecionado';
+            document.querySelector('.file-label').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

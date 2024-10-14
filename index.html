@@ -3,97 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificador de Comprovativo</title>
+    <title>FINPAY - Verificador de Comprovativos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f0f3f6;
+            --text-color: #2c3e50;
+            --error-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            place-items: center;
+            padding: 20px;
         }
-        h1 {
-            color: #2c3e50;
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
             font-size: 2.5em;
             margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            color: var(--primary-color);
+            animation: fadeIn 1s ease-out;
         }
+
         #uploadForm {
-            margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 20px;
         }
+
         #fileInput {
             display: none;
         }
+
         .file-label {
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            display: inline-block;
         }
+
         .file-label:hover {
             background-color: #2980b9;
+            transform: scale(1.05);
         }
+
         button {
-            background-color: #2ecc71;
+            background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             font-size: 1em;
+            width: 100%;
+            max-width: 200px;
         }
+
         button:hover {
             background-color: #27ae60;
+            transform: scale(1.05);
         }
+
         #result {
-            background-color: white;
+            margin-top: 30px;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            white-space: pre-wrap;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 600px;
+            background-color: #f8f9fa;
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: all 0.5s ease;
         }
+
         #result.show {
             opacity: 1;
             transform: translateY(0);
         }
+
         .valid {
-            color: #2ecc71;
-            font-weight: bold;
+            color: var(--secondary-color);
         }
+
         .invalid {
-            color: #e74c3c;
-            font-weight: bold;
+            color: var(--error-color);
         }
+
         .icon {
+            font-size: 1.5em;
             margin-right: 10px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -104,18 +143,35 @@
             animation: spin 1s ease-in-out infinite;
             margin-right: 10px;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Verificador de Comprovativo</h1>
-    <form id="uploadForm">
-        <label for="fileInput" class="file-label">
-            <i class="fas fa-file-upload"></i> Escolher Arquivo
-        </label>
-        <input type="file" id="fileInput" required>
-        <button type="submit"><i class="fas fa-check"></i> Verificar</button>
-    </form>
-    <div id="result"></div>
+    <div class="container">
+        <h1>FINPAY - Verificador de Comprovativos</h1>
+        <form id="uploadForm">
+            <label for="fileInput" class="file-label">
+                <i class="fas fa-file-upload"></i> Escolher Arquivo
+            </label>
+            <input type="file" id="fileInput" required>
+            <button type="submit"><i class="fas fa-check"></i> Verificar</button>
+        </form>
+        <div id="result"></div>
+    </div>
 
     <script>
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -144,11 +200,8 @@
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log(response.data)
+
                 const isValid = response.data.original;
-
-
-
 
                 const icon = isValid ? '<i class="fas fa-check-circle icon"></i>' : '<i class="fas fa-times-circle icon"></i>';
                 const status = isValid ? 'Comprovativo Válido' : 'Comprovativo Falso';
@@ -157,7 +210,6 @@
                 resultDiv.innerHTML = `
                     <h2 class="${statusClass}">${icon}${status}</h2>
                 `;
-
 
             } catch (error) {
                 resultDiv.innerHTML = `<h2 class="invalid"><i class="fas fa-exclamation-triangle icon"></i>Erro</h2>

@@ -202,6 +202,7 @@
                 });
 
                 const isValid = response.data.original;
+                console.log(response.data.metadata)
 
                 const icon = isValid ? '<i class="fas fa-check-circle icon"></i>' : '<i class="fas fa-times-circle icon"></i>';
                 const status = isValid ? 'Comprovativo Válido' : 'Comprovativo Falso';
